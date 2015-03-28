@@ -1,11 +1,11 @@
 import json
-import hmac
+from copy import deepcopy
 
 from django.test import TestCase
 
 from checksums.settings import SECRET_KEY
 from api.models import Url
-
+from api.digest import build_url_string, create_hmac_digest
 
 
 class ApiTest(TestCase):
@@ -23,19 +23,14 @@ class ApiTest(TestCase):
       'q': 'foo',
       'fb': 'x',
       'g': 'y',
+      'superman': 'batman',
+      'bobloblaw': 'blahblahblah',
     }
-    # self.model_params = {
-    #   'url': "http://www.google.com",
-    #   'url_params': json.dumps(self.url_params),
-    # }
-
-    # new_url = Url.objects.create(**self.model_params)
-    # new_url.save()
 
   def tearDown(self):
     """Clear test database
     """
-    # Url.objects.all().delete()
+    pass
 
 
   ### Test Methods ###
@@ -47,6 +42,7 @@ class ApiTest(TestCase):
     )
     self.assertEqual(response.status_code, 200)
 
+
   def test_api_createchecksum_returns_checksum(self):
     response = self.client.post(
       '/api/createchecksum/',
@@ -55,34 +51,55 @@ class ApiTest(TestCase):
     )
 
     # Build the response content from previously set data
-    response_content = ''
-    for key, value in self.url_params.iteritems():
-      if key == 'url':
-        response_content = self.url_params['url'] + '?'
-      else:
-        response_content += "%s=%s&" % (key, value)
-    response_content = response_content[:-1]
+    response_content = build_url_string(self.url_params)
+    print('response_content in test: %s' % (response_content,))
 
     # Create the HMAC digest and append
-    digester = hmac.new(
-      key=SECRET_KEY,
-      msg=response_content
-    )
-    digest = digester.hexdigest()
+    digest = create_hmac_digest(SECRET_KEY, response_content)
     response_content += "&checksum=%s" % (digest,)
-
-    print("from request: %s" % (response.content,))
-    print("built locally: %s" % (response_content,))
 
     self.assertEqual(response.content, response_content)
 
 
-  # def test_api_verifychecksum_returns_404(self):
-  #   verify_params = self.model_params
-  #   verify_params['checksum'] = 'not a real checksum'
-  #   response = self.client.get(
-  #     '/api/verifychecksum/',
-  #     verify_params,
-  #     HTTP_X_REQUESTED_WITH='XMLHttpRequest',
-  #   )
-  #   self.assertEqual(response.status_code, 404)
+  def test_api_verifychecksum_verifies_correctly(self):
+    # POST request to create entry in database
+    self.client.post(
+      '/api/createchecksum/',
+      self.url_params,
+      HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+
+    # Build the response content from previously set data
+    check_content = build_url_string(self.url_params)
+
+    # Create the HMAC digest and append
+    digest = create_hmac_digest(SECRET_KEY, check_content)
+
+    check_params = deepcopy(self.url_params)
+    check_params['checksum'] = digest
+
+    response = self.client.get(
+      '/api/verifychecksum/',
+      check_params,
+      HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.content, 'verified')
+
+
+  def test_api_verifychecksum_returns_404_on_verification_failure(self):
+    # POST request to create entry in database
+    self.client.post(
+      '/api/createchecksum/',
+      self.url_params,
+      HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+    )
+
+    verify_params = self.url_params
+    verify_params['checksum'] = 'not a real checksum'
+    response = self.client.get(
+      '/api/verifychecksum/',
+      verify_params,
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+    )
+    self.assertEqual(response.status_code, 404)

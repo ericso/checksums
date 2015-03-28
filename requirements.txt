@@ -1,1 +1,4 @@
-Django==1.7.5
+Django==1.7
+hashlib==20081119
+hmac==20101005
+wsgiref==0.1.2
