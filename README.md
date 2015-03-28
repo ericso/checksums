@@ -8,24 +8,24 @@ Routes:
 
 Clone this repo:
 
-git clone git@github.com:ericso/checksums.git
+  git clone git@github.com:ericso/checksums.git
 
 
 Create a virtual environment, or not:
 
-But if you do, use virtualenvwrapper:
-https://virtualenvwrapper.readthedocs.org/en/latest/
+  But if you do, use virtualenvwrapper:
+  https://virtualenvwrapper.readthedocs.org/en/latest/
 
 
 Run the app:
 
-mkvirtualenv checksums
+  mkvirtualenv checksums
 
-pip install -r requirements
+  pip install -r requirements
 
-python manage.py runserver
+  python manage.py runserver
 
 
 Run the tests:
 
-python manage.py test
+  python manage.py test
