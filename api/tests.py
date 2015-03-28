@@ -11,7 +11,7 @@ from api.digest import build_url_string, create_hmac_digest
 class ApiTest(TestCase):
   """Test class for api
   Routes:
-  POST /api/createchecksum - Returns the provide URL with a checksum value
+  POST /api/createchecksum - Returns the provided URL with a checksum value
   GET /api/verifychecksum - Returns a 200 or 404 response depending on whether the provided checksum verifies against provided URL
   """
 
