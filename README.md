@@ -15,13 +15,11 @@ Create a virtual environment, or not. But if you do, use virtualenvwrapper:
 
   https://virtualenvwrapper.readthedocs.org/en/latest/
 
+    mkvirtualenv checksums
 
 Run the app:
 
-    mkvirtualenv checksums
-
     pip install -r requirements
-
     python manage.py runserver
 
 
