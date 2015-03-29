@@ -26,3 +26,19 @@ Run the app:
 Run the tests:
 
     python manage.py test
+
+Usage:
+
+  Make a get request to /api/createchecksum:
+
+    GET /api/createchecksum/?url=http://www.example.com/?param1=val1
+
+  The request will return a string with the sent url and a checksum:
+
+    http://www.example.com/?param1=val1&checksum=somechecksum
+
+  To verify the checksum:
+
+    GET /api/verifychecksum/?url=http://www.example.com/?param1=val1&checksum=somechecksum
+
+  The request will either return 200 OK with "verified" in the content or a 404 error if not verified
