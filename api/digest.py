@@ -3,26 +3,6 @@
 import hmac
 import json
 
-def build_url_string(params):
-  """Given a dictionary, return a url string of the from
-
-    http://www.google.com?q=foo&fb=x&g=y
-
-  Args:
-    params (dict): named url parameters
-      url: base string e.g. http://www.google.com
-  """
-  # Build the response content from previously set data
-  return_str = params['url'] + '?'
-  params.pop('url', None)
-
-  # params = sorted(params.keys())
-  # print(params)
-
-  for key, value in params.iteritems():
-    return_str += "%s=%s&" % (key, value)
-  return return_str[:-1]
-
 
 def build_hash_string(params):
   """Given a dictionary, return a frozenset of the dictionary

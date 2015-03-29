@@ -6,23 +6,14 @@ from django.http import HttpResponse, Http404
 # from django.http import JsonResponse
 
 from checksums.settings import SECRET_KEY
-from api.digest import build_url_string, build_hash_string, create_hmac_digest
-
-
-def _remove_key(d, key):
-  """Returns a copy of the dictionary with specified key removed
-  """
-  r = deepcopy(d)
-  del r[key]
-  return r
+from api.digest import build_hash_string, create_hmac_digest
+from api.utils import parse_url_params, build_url_string
 
 
 def createchecksum(request):
   """Returns a HMAC checksum digest
   """
-  request_params = {}
-  for key, value in request.GET.iteritems():
-    request_params[key] = value
+  request_params = parse_url_params(request.GET)
 
   # Build checksum string and create the checksum
   request_str = build_url_string(deepcopy(request_params))
@@ -39,13 +30,10 @@ def createchecksum(request):
 def verifychecksum(request):
   """Takes a request and verifies the checksum
   """
-  request_params = {}
-  for key, value in request.GET.iteritems():
-    request_params[key] = value
+  request_params = parse_url_params(request.GET)
 
   # Get the checksum and remove it from request_params
   checksum_to_verify = request_params.pop('checksum', None)
-  # request_params = _remove_key(request_params, 'checksum')
 
   # Remove checksum parameter, build checksum string, get checksum
   request_str = build_url_string(deepcopy(request_params))
@@ -59,17 +47,3 @@ def verifychecksum(request):
     return HttpResponse('verified')
   else:
     raise Http404("Url object checksum does not match")
-
-  # # Get Url object from database matching url and params
-  # try:
-  #   url = Url.objects.get(
-  #     url=request_params['url'],
-  #     params=json.dumps(_remove_key(request_params, 'url'))
-  #   )
-  # except:
-  #   raise Http404("Could not find Url object")
-  # else:
-  #   if url.checksum == checksum:
-  #     return HttpResponse('verified')
-  #   else:
-  #     raise Http404("Url object checksum does not match")
