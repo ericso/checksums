@@ -2,7 +2,7 @@ An app that calculates a checksum from a given callback url to verify on a subse
 
 Routes:
 
-    POST /api/createchecksum - Returns the provided URL with a checksum value
+    GET /api/createchecksum - Returns the provided URL with a checksum value
     GET /api/verifychecksum - Returns a 200 or 404 response depending on whether the provided checksum verifies against provided URL
 
 
