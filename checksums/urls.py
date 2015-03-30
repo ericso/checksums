@@ -3,7 +3,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'checksums.views.home', name='home'),
+    url(r'^$', 'ui.views.home', name='home'),
     url(r'^api/', include('api.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
